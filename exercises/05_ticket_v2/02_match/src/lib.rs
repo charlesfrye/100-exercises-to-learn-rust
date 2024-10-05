@@ -7,9 +7,13 @@ enum Shape {
 }
 
 impl Shape {
-    // TODO: Implement the `n_sides` method using a `match`.
     pub fn n_sides(&self) -> u8 {
-        todo!()
+        match self {
+            Shape::Pentagon => 5,
+            Shape::Square | Shape::Rectangle => 4,
+            Shape::Triangle => 3,
+            Shape::Circle => 0,
+        }
     }
 }
 
