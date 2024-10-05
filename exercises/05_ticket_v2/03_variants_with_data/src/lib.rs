@@ -1,4 +1,3 @@
-// TODO: Implement `Ticket::assigned_to`.
 //  Return the name of the person assigned to the ticket, if the ticket is in progress.
 //  Panic otherwise.
 
@@ -38,7 +37,12 @@ impl Ticket {
         }
     }
     pub fn assigned_to(&self) -> &str {
-        todo!()
+        match &self.status {
+            Status::InProgress {
+                assigned_to: assignee,
+            } => assignee,
+            _ => panic!("Only `In-Progress` tickets can be assigned to someone"),
+        }
     }
 }
 
