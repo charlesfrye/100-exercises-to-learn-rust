@@ -1,5 +1,3 @@
-// TODO: Implement the `to_dos` method. It must return a `Vec` of references to the tickets
-//  in `TicketStore` with status set to `Status::ToDo`.
 use ticket_fields::{TicketDescription, TicketTitle};
 
 #[derive(Clone)]
@@ -30,6 +28,19 @@ impl TicketStore {
 
     pub fn add_ticket(&mut self, ticket: Ticket) {
         self.tickets.push(ticket);
+    }
+
+    pub fn to_dos(&self) -> Vec<&Ticket> {
+        self.tickets
+            .iter()
+            .filter(|&ticket| ticket.status == Status::ToDo)
+            .collect()
+    }
+}
+
+impl Default for TicketStore {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
