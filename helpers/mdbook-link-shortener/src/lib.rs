@@ -59,6 +59,12 @@ impl LinkShortener {
     }
 }
 
+impl Default for LinkShortener {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Preprocessor for LinkShortener {
     fn name(&self) -> &str {
         "link-shortener"
@@ -183,8 +189,8 @@ fn replace_anchors(
                                 unshortened_links.insert(dest_url.to_string());
                                 return e;
                             }
-                            let alias = alias_gen.next_until_unique(&link2alias);
-                            alias
+
+                            alias_gen.next_until_unique(link2alias)
                         };
                         link2alias.insert(dest_url.to_string(), alias.clone());
 

@@ -11,6 +11,12 @@ impl ExerciseLinker {
     }
 }
 
+impl Default for ExerciseLinker {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Preprocessor for ExerciseLinker {
     fn name(&self) -> &str {
         "exercise-linker"
@@ -54,15 +60,15 @@ fn process_book_item(item: &mut BookItem, renderer: &str, root_url: &str) {
             let source_path = source_path.display().to_string();
 
             // Ignore non-exercise chapters
-            if !source_path.chars().take(2).all(|c| c.is_digit(10)) {
+            if !source_path.chars().take(2).all(|c| c.is_ascii_digit()) {
                 return;
             }
 
             let exercise_path = source_path.strip_suffix(".md").unwrap();
             let link_section = format!(
-                    "\n## Exercise\n\nThe exercise for this section is located in [`{exercise_path}`]({})\n",
-                    format!("{}/{}", root_url, exercise_path)
-                );
+                "\n## Exercise\n\nThe exercise for this section is located in [`{exercise_path}`]({}/{})\n",
+                root_url, exercise_path
+            );
             chapter.content.push_str(&link_section);
 
             if renderer == "pandoc" {

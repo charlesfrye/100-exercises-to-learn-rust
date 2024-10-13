@@ -16,7 +16,7 @@ mod tests {
         // literal. If we were to use a variable, the compiler wouldn't be able to
         // catch this at compile time.
         #[allow(overflowing_literals)]
-        let x = { 255 as i8 };
+        let x = { 255 };
 
         // You could solve this by using exactly the same expression as above,
         // but that would defeat the purpose of the exercise. Instead, use a genuine
