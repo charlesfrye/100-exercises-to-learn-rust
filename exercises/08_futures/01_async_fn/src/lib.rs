@@ -1,7 +1,8 @@
-use tokio::net::TcpListener;
+use tokio::{
+    io::{AsyncReadExt, AsyncWriteExt},
+    net::TcpListener,
+};
 
-// TODO: write an echo server that accepts incoming TCP connections and
-//  echoes the received data back to the client.
 //  `echo` should not return when it finishes processing a connection, but should
 //  continue to accept new connections.
 //
@@ -11,7 +12,19 @@ use tokio::net::TcpListener;
 // - `tokio::net::TcpStream::split` to obtain a reader and a writer from the socket
 // - `tokio::io::copy` to copy data from the reader to the writer
 pub async fn echo(listener: TcpListener) -> Result<(), anyhow::Error> {
-    todo!()
+    loop {
+        let (mut strm, addr) = listener.accept().await?;
+        let (mut reader, mut writer) = strm.split();
+        let mut buffer = [0; 1024];
+        loop {
+            let n = reader.read(&mut buffer).await?;
+            if n > 0 {
+                writer.write_all(&buffer[..n]).await?;
+            } else {
+                break;
+            }
+        }
+    }
 }
 
 #[cfg(test)]
