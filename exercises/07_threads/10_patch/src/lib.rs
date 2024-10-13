@@ -1,6 +1,5 @@
 use std::sync::mpsc::{sync_channel, Receiver, SyncSender};
 
-// TODO: Implement the patching functionality.
 use crate::data::{Ticket, TicketDraft, TicketPatch};
 use crate::store::{TicketId, TicketStore};
 
@@ -35,7 +34,17 @@ impl TicketStoreClient {
         Ok(response_receiver.recv().unwrap())
     }
 
-    pub fn update(&self, ticket_patch: TicketPatch) -> Result<(), OverloadedError> {}
+    pub fn update(&self, ticket_patch: TicketPatch) -> Result<(), OverloadedError> {
+        let (response_sender, response_receiver) = sync_channel(1);
+        self.sender
+            .try_send(Command::Update {
+                patch: ticket_patch,
+                response_channel: response_sender,
+            })
+            .map_err(|_| OverloadedError)?;
+        response_receiver.recv().unwrap();
+        Ok(())
+    }
 }
 
 #[derive(Debug, thiserror::Error)]
@@ -48,7 +57,7 @@ pub fn launch(capacity: usize) -> TicketStoreClient {
     TicketStoreClient { sender }
 }
 
-enum Command {
+pub enum Command {
     Insert {
         draft: TicketDraft,
         response_channel: SyncSender<TicketId>,
@@ -85,7 +94,20 @@ pub fn server(receiver: Receiver<Command>) {
                 patch,
                 response_channel,
             }) => {
-                todo!()
+                // get by id
+                let ticket = store.get_mut(patch.id);
+                match ticket {
+                    None => panic!(),
+                    Some(ticket) => {
+                        *ticket = Ticket {
+                            id: patch.id,
+                            title: patch.title.unwrap_or(ticket.title.clone()),
+                            description: patch.description.unwrap_or(ticket.description.clone()),
+                            status: patch.status.unwrap_or(ticket.status),
+                        };
+                        response_channel.send(()).unwrap()
+                    }
+                }
             }
             Err(_) => {
                 // There are no more senders, so we can safely break

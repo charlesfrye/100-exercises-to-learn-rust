@@ -39,3 +39,9 @@ impl TicketStore {
         self.tickets.get_mut(&id)
     }
 }
+
+impl Default for TicketStore {
+    fn default() -> Self {
+        Self::new()
+    }
+}
